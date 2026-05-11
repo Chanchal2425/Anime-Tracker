@@ -1,0 +1,414 @@
+/* ── Page Layout ── */
+.add-page {
+  min-height: 100vh;
+  background-color: #141414;
+  padding: 0 4% 60px;
+  color: #fff;
+}
+
+/* ── Hero Search ── */
+.search-hero {
+  padding: 100px 0 60px;
+  text-align: center;
+}
+
+.search-headline {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #fff, #e50914);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.search-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  padding: 6px 6px 6px 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+  border-color: #e50914;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.3);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  color: #b3b3b3;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 12px;
+  font-size: 1rem;
+  color: #fff;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: #808080;
+}
+
+.search-btn {
+  background: #e50914;
+  border: none;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.search-btn:hover {
+  background: #f40612;
+  transform: scale(1.02);
+}
+
+/* ── Loading Spinner ── */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #e50914;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #808080;
+}
+
+.empty-state p {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+/* ── Results Grid ── */
+.search-results {
+  margin-top: 20px;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 0 10px;
+}
+
+/* ── Anime Card ── */
+.search-card {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.search-card:hover {
+  transform: scale(1.05) translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+}
+
+.card-img-container {
+  position: relative;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.search-card:hover .card-img {
+  transform: scale(1.1);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.search-card:hover .card-overlay {
+  opacity: 1;
+}
+
+.add-btn {
+  background: #e50914;
+  border: none;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background: #f40612;
+}
+
+/* ── Card Info ── */
+.card-info {
+  padding: 10px 12px 14px;
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-rating {
+  font-size: 0.8rem;
+  color: #b3b3b3;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .search-hero {
+    padding: 60px 0 40px;
+  }
+
+  .search-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  .search-btn {
+    width: 100%;
+    margin: 0;
+    border-radius: 12px;
+  }
+  .search-input {
+    width: 100%;
+  }
+}
+
+
+/* ── Floating Top 10 Row ── */
+/* ===== Floating Row ===== */
+.floating-row {
+  position: relative;
+  margin: 20px auto 40px;
+  max-width: 1400px;
+  padding: 0 4%;
+  overflow: hidden;    /* hides the edge overflow so the loop looks seamless */
+}
+
+/* Glass badge in top‑left corner */
+.floating-badge {
+  position: absolute;
+  top: -12px;
+  left: 4%;
+  z-index: 2;
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 6px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.floating-badge-icon {
+  font-size: 1.1rem;
+}
+
+.floating-badge-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+/* Track that holds both slides */
+.floating-track {
+  display: flex;
+  width: fit-content;
+  animation: scroll 40s linear infinite;
+  margin-top: 30px;  /* push below the badge */
+}
+
+/* Pause on hover for better interaction */
+.floating-track:hover {
+  animation-play-state: paused;
+}
+
+.floating-slide {
+  display: flex;
+  gap: 16px;
+}
+
+.floating-card {
+  flex: 0 0 auto;
+  width: 140px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.floating-card:hover {
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+}
+
+.floating-card img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.floating-card:hover img {
+  transform: scale(1.08);
+}
+
+.floating-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  gap: 8px;
+}
+
+.floating-card:hover .floating-card-overlay {
+  opacity: 1;
+}
+
+.floating-btn {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s, transform 0.1s;
+  width: 80%;
+  justify-content: center;
+}
+
+.floating-btn.play-btn {
+  background: #e50914;
+  border-color: #e50914;
+}
+
+.floating-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.03);
+}
+
+.floating-btn.play-btn:hover {
+  background: #f40612;
+}
+
+.floating-card-title {
+  font-size: 0.8rem;
+  padding: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Infinite scroll keyframes */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 8px));  /* 50% of total double‑slide width + half the gap */
+  }
+}
+
+/* Floating top‑10 add button */
+.floating-btn.add-btn.added,
+.search-card .card-overlay .add-btn.added {
+  background: #2ecc71;
+  border-color: #2ecc71;
+  color: #fff;
+}
+
+/* Optional: play button red */
+.search-card .card-overlay .add-btn.play-btn {
+  background: #e50914;
+  border-color: #e50914;
+}
