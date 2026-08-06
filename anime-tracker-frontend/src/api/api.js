@@ -1,8 +1,9 @@
-// api.js
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/api`
+    : "https://anime-tracker-fltw.onrender.com/api",
 });
 
 API.interceptors.request.use((config) => {
@@ -21,7 +22,7 @@ API.interceptors.response.use(
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
 
-      // Redirect to login page if user isn't on a public route (e.g. public shared notes)
+      // Redirect to login page if user isn't on a public route
       const isPublicRoute = window.location.pathname.startsWith("/note/");
       if (!isPublicRoute && window.location.pathname !== "/login") {
         window.location.href = "/login";

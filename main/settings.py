@@ -77,7 +77,7 @@ ROOT_URLCONF = 'main.urls'
 CORS_ALLOW_CREDENTIALS = True
 
 # Required for Google Identity Services / OAuth Popups
-SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 # Ensure CORS allows local Vite origins
 CORS_ALLOWED_ORIGINS = [
