@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";   // new
+import { AuthProvider, useAuth } from "./context/AuthContext"; 
 import { AnimeDetailProvider } from "./context/AnimeDetailContext";
 import { TrailerProvider } from "./context/TrailerContext";
 import { WatchlistProvider } from "./context/WatchlistContext";
@@ -7,32 +7,27 @@ import Home from "./pages/Home";
 import AnimeList from "./pages/AnimeList";
 import AddAnime from "./pages/AddAnime";
 import Recommendations from "./pages/Recommendations";
-import Login from "./pages/Login";         // new
-import Register from "./pages/Register";   // new
+import Login from "./pages/Login"; 
 import Navbar from "./components/Navbar";
+import SharedNoteView from "./components/SharedNoteView"; 
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>        {/* new: provides user state to everything */}
+      <AuthProvider>
         <AnimeDetailProvider>
           <TrailerProvider>
             <WatchlistProvider>
               <Navbar />
               <Routes>
                 {/* Public routes */}
+                <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                
+                {/* Public Share Route */}
+                <Route path="/note/:noteId" element={<SharedNoteView />} />
 
                 {/* Protected routes – require login */}
-                <Route
-                  path="/"
-                  element={
-                    <RequireAuth>
-                      <Home />
-                    </RequireAuth>
-                  }
-                />
                 <Route
                   path="/anime"
                   element={

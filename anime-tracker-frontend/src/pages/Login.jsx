@@ -1,66 +1,57 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
-import "./Auth.css";
+import { useEffect } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+    const { user, googleLogin } = useAuth();
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    if (!username || !password) {
-      setError("All fields are required.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await login(username, password);
-      navigate("/");
-    } catch (err) {
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Login failed.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
-  return (
-    <div className="auth-container">
-      <form onSubmit={handleSubmit} className="auth-form">
-        <h2>Welcome Back</h2>
-        {error && <div className="auth-error">{error}</div>}
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoComplete="username"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-        />
-        <button disabled={loading} type="submit">
-          {loading ? "Logging in..." : "Login"}
-        </button>
-        <p className="auth-switch">
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
-      </form>
-    </div>
-  );
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            // credentialResponse.credential contains the ID Token
+            await googleLogin(credentialResponse.credential);
+            navigate("/");
+        } catch (error) {
+            console.error("Google authentication failed", error);
+        }
+    };
+
+    return (
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '70vh',
+        }}>
+            <div style={{
+                background: '#121214',
+                border: '1px solid #2a2a2e',
+                borderRadius: '16px',
+                padding: '40px',
+                textAlign: 'center',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+            }}>
+                <h2 style={{ color: '#fff', marginBottom: '8px' }}>Welcome Back</h2>
+                <p style={{ color: '#888', marginBottom: '24px' }}>Sign in to continue to Anime Tracker</p>
+                
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => console.log('Login Failed')}
+                        theme="filled_black"
+                        shape="pill"
+                        size="large"
+                        width="250"
+                    />
+                </div>
+            </div>
+        </div>
+    );
 }

@@ -7,52 +7,62 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-
     // Check existing session on mount
     useEffect(() => {
+        const token = localStorage.getItem("access");
+
+        if (!token) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
         API.get("/me/")
-            .then(res => setUser(res.data))
-            .catch(() => setUser(null))
+            .then((res) => setUser(res.data))
+            .catch(() => {
+                localStorage.removeItem("access");
+                localStorage.removeItem("refresh");
+                setUser(null);
+            })
             .finally(() => setLoading(false));
     }, []);
 
     const login = async (username, password) => {
-
-        const res = await API.post("/login/", {
-            username,
-            password,
-        });
-
-        console.log("LOGIN RESPONSE:", res.data);
-
+        const res = await API.post("/login/", { username, password });
         localStorage.setItem("access", res.data.access);
         localStorage.setItem("refresh", res.data.refresh);
-
         setUser(res.data.user);
-
-        console.log("TOKEN SAVED:", localStorage.getItem("access"));
     };
+
+    // Add this handler for Google OAuth backend response
+// AuthContext.jsx
+const googleLogin = async (googleToken) => {
+    // Changing from "/google/" to "/auth/google/" matches your Django route
+    const res = await API.post("/auth/google/", { token: googleToken });
+    
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
+    setUser(res.data.user);
+};
+
     const register = async (username, password) => {
         await API.post("/register/", { username, password });
-        // Optionally auto-login after register
         await login(username, password);
     };
-    const logout = async () => {
 
+    const logout = async () => {
         try {
             await API.post("/logout/");
         } catch (err) {
             console.log(err);
         }
-
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
-
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, googleLogin, register, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

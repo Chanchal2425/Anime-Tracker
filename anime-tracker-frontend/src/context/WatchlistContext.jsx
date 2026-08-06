@@ -9,7 +9,6 @@ const getAnimeId = (anime) =>
 
 const extractAnimeData = (anime) => anime.anime || anime;
 
-// Convert any anime object to the format your /auto-add/ expects
 const mapToBackendFormat = (anime) => {
   const poster =
     anime.poster_url ||
@@ -34,9 +33,16 @@ export function WatchlistProvider({ children }) {
   const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("access");
+    if (!token) return; // 👈 Skip fetch if unauthenticated
+
     API.get("/anime/")
       .then((res) => setWatchlist(res.data || []))
-      .catch((err) => console.error("Failed to fetch watchlist", err));
+      .catch((err) => {
+        if (err.response?.status !== 403 && err.response?.status !== 401) {
+          console.error("Failed to fetch watchlist:", err);
+        }
+      });
   }, []);
 
   const isInWatchlist = (anime) => {
@@ -46,6 +52,12 @@ export function WatchlistProvider({ children }) {
   };
 
   const addToWatchlist = async (anime) => {
+    const token = localStorage.getItem("access");
+    if (!token) {
+      alert("Please log in to add items to your watchlist.");
+      return false;
+    }
+
     if (isInWatchlist(anime)) {
       alert("Already in your watchlist!");
       return false;
@@ -54,12 +66,9 @@ export function WatchlistProvider({ children }) {
     const rawAnime = extractAnimeData(anime);
     const payload = mapToBackendFormat(rawAnime);
 
-    console.log("▶ Sending to /auto-add/:", payload);
-
     try {
       await API.post("/auto-add/", payload);
       alert("Added to watchlist!");
-      // Add the mapped payload (which includes the correct ID)
       setWatchlist((prev) => [...prev, payload]);
       return true;
     } catch (err) {
@@ -70,7 +79,7 @@ export function WatchlistProvider({ children }) {
   };
 
   return (
-    <WatchlistContext.Provider value={{ addToWatchlist, isInWatchlist }}>
+    <WatchlistContext.Provider value={{ watchlist, addToWatchlist, isInWatchlist }}>
       {children}
     </WatchlistContext.Provider>
   );

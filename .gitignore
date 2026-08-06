@@ -1,0 +1,32 @@
+# Environment variables (Prevents leaking API keys and client secrets)
+.env
+*.env
+.env.local
+
+# Database (Prevents pushing your local database to GitHub)
+*.sqlite3
+db.sqlite3
+
+# Python Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python Cache Files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node Dependencies (Prevents uploading thousands of dependency files)
+node_modules/
+**/node_modules/
+
+# Frontend Production Builds
+dist/
+build/
+
+# IDE / OS Configuration Files
+.DS_Store
+.vscode/
+.idea/

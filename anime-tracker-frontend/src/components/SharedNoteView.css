@@ -1,0 +1,137 @@
+.shared-note-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 20px;
+  background-color: #0d1117;
+  color: #f0f6fc;
+}
+
+.shared-note-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 680px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.shared-note-poster {
+  width: 200px;
+  flex-shrink: 0;
+  background: #010409;
+}
+
+.shared-note-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shared-note-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  flex-grow: 1;
+}
+
+.shared-note-header h2 {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.shared-badges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.ep-badge {
+  background: #238636;
+  color: #ffffff;
+}
+
+.time-badge {
+  background: #1f6feb;
+  color: #ffffff;
+}
+
+.shared-note-content {
+  background: #0d1117;
+  border-left: 4px solid #8957e5;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+.shared-note-content p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #c9d1d9;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.shared-note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #30363d;
+  padding-top: 16px;
+}
+
+.date-text {
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+
+.explore-btn {
+  background: #238636;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.explore-btn:hover {
+  background: #2ea043;
+}
+
+.share-page-status {
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 1.2rem;
+  color: #8b949e;
+}
+
+.share-page-status.error {
+  color: #f85149;
+}
+
+@media (max-width: 600px) {
+  .shared-note-card {
+    flex-direction: column;
+  }
+  .shared-note-poster {
+    width: 100%;
+    height: 240px;
+  }
+}

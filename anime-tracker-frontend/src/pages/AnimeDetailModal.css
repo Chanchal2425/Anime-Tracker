@@ -65,11 +65,11 @@
   font-size: 1.1rem;
 }
 
-/* ── Header ── */
-.detail-header {
+/* ── Header Hero ── */
+.detail-hero {
   display: flex;
   gap: 24px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .detail-poster {
@@ -113,191 +113,102 @@
   border-radius: 4px;
 }
 
-/* ── Extra sections ── */
-.detail-extra {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding-top: 24px;
-}
-
-.detail-section h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #e50914;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 12px;
-}
-
-/* ── Directors list ── */
-.director-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.director-list li {
-  font-size: 0.95rem;
-  color: #eee;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.director-role {
-  font-size: 0.8rem;
-  color: #888;
-  font-weight: normal;
-}
-
-/* ── Character cards ── */
-
-/* ── Character cards ── */
-.character-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* bigger min size */
-  gap: 16px;
-}
-
-.character-card {
-  background: rgba(255,255,255,0.05);
-  border-radius: 14px;
-  padding: 16px;                /* more padding */
-  transition: background 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.character-card:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateY(-4px);
-}
-
-/* Character image */
-.char-avatar-wrapper {
-  width: 90px;                  /* bigger character image */
-  height: 90px;
+/* ── Track Progress Section (Updated 2-Row Layout) ── */
+.episode-action-card {
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 10px;
-  background: #1e1e1e;
+  padding: 18px 20px;
+  margin: 20px 0;
 }
 
-.char-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
-.character-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+.action-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
   color: #fff;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Voice actor row */
-.voice-actor {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: auto;
-}
-
-.va-avatar {
-  width: 32px;                  /* a little bigger */
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #444;
-}
-
-.va-avatar-placeholder {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #e50914;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.8rem;
-}
-
-.va-name {
-  font-size: 0.85rem;
+.next-ep-badge {
   color: #b3b3b3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* Loading / empty text */
-.loading-text,
-.no-data {
   font-size: 0.9rem;
-  color: #808080;
-  font-style: italic;
 }
 
-/* ── Responsive ── */
-@media (max-width: 700px) {
-  .detail-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .detail-poster {
-    width: 140px;
-  }
-  .detail-extra {
-    grid-template-columns: 1fr;
-  }
-  .character-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  }
-}
-
-.episode-action {
+.action-inputs {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 1rem;
+  gap: 12px;
 }
-.episode-note-input {
+
+/* Row 1: Side-by-side inputs */
+.input-row {
+  display: flex;
+  gap: 12px;
   width: 100%;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #555;
-  background: #2a2a2a;
-  color: #eee;
 }
+
+.episode-note-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #262626;
+  color: #fff;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.timestamp-input {
+  width: 200px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #262626;
+  color: #fff;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.episode-note-input:focus,
+.timestamp-input:focus {
+  outline: none;
+  border-color: #e50914;
+}
+
+.input-required {
+  border-color: #ff4d4f !important;
+}
+
+/* Row 2: Action Button */
 .mark-episode-btn {
-  padding: 8px 16px;
-  background: #e63946;
+  align-self: flex-start;
+  padding: 10px 20px;
+  background: #e50914;
   border: none;
   border-radius: 6px;
   color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+
+.mark-episode-btn:hover {
+  background: #f40612;
+}
+
 .mark-episode-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Notes section container */
+/* ── Episode Notes Section ── */
 .episode-notes-section {
   margin-top: 2rem;
   padding: 1.5rem 1rem;
@@ -315,7 +226,6 @@
   gap: 0.5rem;
 }
 
-/* Individual note card */
 .note-card {
   background: #121212;
   border: 1px solid #333;
@@ -324,8 +234,9 @@
   margin-bottom: 12px;
   transition: border-color 0.2s, transform 0.2s;
 }
+
 .note-card:hover {
-  border-color: #e63946;
+  border-color: #e50914;
   transform: translateY(-2px);
 }
 
@@ -337,7 +248,7 @@
 }
 
 .note-episode {
-  background: #e63946;
+  background: #e50914;
   color: white;
   padding: 2px 8px;
   border-radius: 12px;
@@ -385,11 +296,175 @@
   gap: 4px;
   transition: all 0.2s;
 }
+
 .share-note-btn:hover {
-  border-color: #e63946;
-  color: #e63946;
+  border-color: #e50914;
+  color: #e50914;
 }
+
 .share-note-btn:active {
-  background: #e63946;
+  background: #e50914;
   color: white;
+}
+
+/* ── Extra sections ── */
+.detail-extra {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 24px;
+}
+
+.detail-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e50914;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+/* Directors list */
+.director-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.director-list li {
+  font-size: 0.95rem;
+  color: #eee;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.director-role {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: normal;
+}
+
+/* Character cards */
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.character-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 16px;
+  transition: background 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.character-card:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-4px);
+}
+
+.char-avatar-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: #1e1e1e;
+}
+
+.char-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.character-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.voice-actor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.va-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #444;
+}
+
+.va-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e50914;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.va-name {
+  font-size: 0.85rem;
+  color: #b3b3b3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loading-text,
+.no-data {
+  font-size: 0.9rem;
+  color: #808080;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+  .detail-hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .detail-poster {
+    width: 140px;
+  }
+  .input-row {
+    flex-direction: column;
+  }
+  .timestamp-input {
+    width: 100%;
+  }
+  .mark-episode-btn {
+    width: 100%;
+  }
+  .detail-extra {
+    grid-template-columns: 1fr;
+  }
+  .character-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
 }

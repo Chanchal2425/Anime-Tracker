@@ -15,7 +15,7 @@ function Row({ title, data }) {
       <h2 className="row-title">{title}</h2>
       <div className="row-posters">
         {data.map((item, index) => {
-          // 🔥 EXTRACT REAL ANIME (handles nested recommendation objects)
+          // Extract real anime object (handles nested recommendation wrapper)
           const anime = item.anime || item;
 
           const image =
@@ -28,11 +28,14 @@ function Row({ title, data }) {
           const alreadyAdded = isInWatchlist(anime);
           const animeId = anime.mal_id || anime.id;
 
+          // Unique key combining row title, ID, and array index
+          const cardKey = `row-${title ? title.replace(/\s+/g, '-') : 'cat'}-${animeId || 'no-id'}-${index}`;
+
           return (
-            <div className="card" key={animeId || index}>
+            <div className="card" key={cardKey}>
               <img
                 src={image}
-                alt={anime.title}
+                alt={anime.title || "Anime Poster"}
                 className="card-img"
                 loading="lazy"
                 onError={(e) => {
@@ -41,7 +44,7 @@ function Row({ title, data }) {
                 }}
               />
               <div className="card-overlay">
-                <h4 className="card-title">{anime.title}</h4>
+                <h4 className="card-title">{anime.title || "Untitled"}</h4>
                 <div className="card-buttons">
                   <button
                     className="card-btn play-btn"
@@ -51,25 +54,13 @@ function Row({ title, data }) {
                   </button>
                   <button
                     className={`card-btn add-btn ${alreadyAdded ? "added" : ""}`}
-                    onClick={() => {
-                      if (!animeId) {
-                        alert("Cannot add – missing ID.");
-                        return;
-                      }
-                      addToWatchlist(anime);
-                    }}
+                    onClick={() => addToWatchlist(anime)}
                   >
                     {alreadyAdded ? "✓ Added" : "+ Add"}
                   </button>
                   <button
                     className="card-btn info-btn"
-                    onClick={() => {
-                      if (animeId) {
-                        openAnimeDetail(anime);
-                      } else {
-                        alert("No details available.");
-                      }
-                    }}
+                    onClick={() => openAnimeDetail(anime)}
                   >
                     ℹ More Info
                   </button>

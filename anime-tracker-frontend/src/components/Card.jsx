@@ -14,6 +14,8 @@ function Card({ anime }) {
     setHovered(false);
   };
 
+  
+
   return (
     <div
       className={`card ${hovered ? "active" : ""}`}

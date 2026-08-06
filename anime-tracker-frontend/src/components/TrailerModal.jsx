@@ -16,17 +16,44 @@ function TrailerModal({ embedUrl, onClose }) {
     if (e.target === overlayRef.current) onClose();
   };
 
+  const getEmbedUrl = (url) => {
+    if (!url) return "";
+
+    let videoId = "";
+
+    // Handle youtube.com/watch?v=ID or youtube.com/embed/ID or youtu.be/ID
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      videoId = match[2];
+    }
+
+    if (videoId) {
+      // Force embed format with origin safety to stay in-app
+      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+    }
+
+    return url;
+  };
+
+  const formattedUrl = getEmbedUrl(embedUrl);
+
   return (
     <div className="modal-overlay" ref={overlayRef} onClick={handleOverlayClick}>
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>✖</button>
-        <iframe
-          src={`${embedUrl}?autoplay=1`}
-          title="Trailer"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          className="trailer-iframe"
-        />
+        {formattedUrl ? (
+          <iframe
+            src={formattedUrl}
+            title="Trailer Preview"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="trailer-iframe"
+          />
+        ) : (
+          <div className="no-trailer">Trailer unavailable</div>
+        )}
       </div>
     </div>
   );

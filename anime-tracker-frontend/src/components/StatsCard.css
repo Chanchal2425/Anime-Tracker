@@ -1,74 +1,159 @@
-/* ── Grid already styled in your container ── */
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL THEME VARIABLES & ACCENTS (RED & BLACK PALETTE)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --card-bg: rgba(15, 15, 20, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover-border: rgba(229, 9, 20, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+}
 
-/* ── Base Card ── */
+/* Color Themes (Subtle variations within the Red/Dark spectrum) */
+.theme-red {
+  --accent-start: #ff4b2b;
+  --accent-end: #e50914;
+  --glow-color: rgba(229, 9, 20, 0.35);
+}
+
+.theme-orange {
+  --accent-start: #ff7300;
+  --accent-end: #e50914;
+  --glow-color: rgba(255, 115, 0, 0.3);
+}
+
+.theme-purple {
+  --accent-start: #d90429;
+  --accent-end: #7209b7;
+  --glow-color: rgba(114, 9, 183, 0.3);
+}
+
+.theme-blue {
+  --accent-start: #ff2a6d;
+  --accent-end: #05d9e8;
+  --glow-color: rgba(255, 42, 109, 0.3);
+}
+
+/* Fallback theme if not specified */
+.stats-card:not([class*="theme-"]) {
+  --accent-start: #ff4b2b;
+  --accent-end: #e50914;
+  --glow-color: rgba(229, 9, 20, 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BASE CARD STYLING (GLASSMORPHISM & HOVER EFFECTS)
+   ───────────────────────────────────────────────────────────── */
 .stats-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
   border-radius: 20px;
-  padding: 28px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 200px;
-  position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Subtle gradient tint overlay */
+/* Ambient Red Ambient Glow Overlay */
 .stats-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top left, rgba(229, 9, 20, 0.08), transparent 60%);
+  background: radial-gradient(circle at top left, var(--glow-color), transparent 60%);
+  opacity: 0.5;
   pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .stats-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
-  border-color: rgba(229, 9, 20, 0.3);
+  transform: translateY(-6px);
+  border-color: var(--card-hover-border);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7), 0 0 25px var(--glow-color);
 }
 
-/* Top section */
-.stats-top {
+.stats-card:hover::before {
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HEADER, TITLE & ICON BADGES
+   ───────────────────────────────────────────────────────────── */
+.stats-top,
+.stats-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
 }
 
 .stats-title {
   font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: #b3b3b3;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
+/* Modern Glowing Icon Container */
+.stats-icon-badge,
 .stats-icon {
-  width: 28px;
-  height: 28px;
-  color: #e50914;
-  opacity: 0.9;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-end);
+  transition: all 0.3s ease;
   flex-shrink: 0;
 }
 
+.stats-icon-badge svg,
 .stats-icon svg {
-  width: 100%;
-  height: 100%;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
-/* Value – big and gradient */
+.stats-card:hover .stats-icon-badge,
+.stats-card:hover .stats-icon {
+  background: var(--accent-end);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 0 14px var(--accent-end);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CARD BODY & GRADIENT VALUES
+   ───────────────────────────────────────────────────────────── */
+.stats-body {
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Large Red-to-White Gradient Text */
 .stats-value {
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
   font-weight: 800;
-  line-height: 1;
-  margin: 10px 0 8px;
+  line-height: 1.05;
+  margin: 8px 0 6px;
   letter-spacing: -1px;
-  background: linear-gradient(135deg, #f5f5f5, #e50914);
+  background: linear-gradient(135deg, #ffffff 30%, var(--accent-end) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -76,51 +161,65 @@
 
 .stats-sub {
   font-size: 0.8rem;
-  color: #808080;
-  margin-top: 4px;
+  color: var(--text-muted);
+  margin: 6px 0 0 0;
+  font-weight: 500;
 }
 
-/* ── Progress Card ── */
+/* ─────────────────────────────────────────────────────────────
+   PROGRESS RING VARIATION
+   ───────────────────────────────────────────────────────────── */
 .progress-card {
   align-items: center;
   text-align: center;
 }
 
+.progress-card .stats-header,
+.progress-card .stats-top {
+  width: 100%;
+}
+
+.progress-ring-container,
 .progress-ring {
   position: relative;
   width: 120px;
   height: 120px;
-  margin: 16px 0;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.progress-svg,
 .progress-ring svg {
-  transform: rotate(-90deg);
   width: 100%;
   height: 100%;
+  transform: rotate(-90deg); /* Starts progress at top (12 o'clock) */
 }
 
 .bg-ring {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.06);
   stroke-width: 8;
 }
 
 .progress-ring-circle {
   fill: none;
-  stroke: url(#progressGradient);
   stroke-width: 8;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s ease;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ring-content {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ring-value {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
-
-/* Gradient for ring – injected in SVG defs inside StatsCard */

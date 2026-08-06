@@ -1,70 +1,55 @@
-import { useEffect, useState, useRef } from "react";  // 👈 add useRef
+import React, { useEffect, useState } from "react";
 import API from "../api/api";
 import Row from "../components/Row";
 import Loader from "../components/Loader";
 
-
 function Recommendations() {
-  const [recs, setRecs] = useState({
-    genre_based: [],
-    similar: [],
-    time_based: [],
-    top: []
-  });
-  const [loading, setLoading] = useState(true);        // 👈 add loading
-  const fetchedRef = useRef(false);
+  const [recs, setRecs] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     API.get("/recommendations/")
-      .then(res => {
-        const data = res.data || {};
-        setRecs({
-          genre_based: data.genre_based || [],
-          similar: data.similar || [],
-          time_based: data.time_based || [],
-          top: data.top || []
-        });
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Recommendation error:", err.response?.data || err.message);
-        setLoading(false);
-      });
+      .then((res) => setRecs(res.data || {}))
+      .catch((err) => console.error("❌ Error fetching recommendations:", err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const hasData =
-    recs.genre_based.length > 0 ||
-    recs.similar.length > 0 ||
-    recs.time_based.length > 0 ||
-    recs.top.length > 0;
+  if (loading) return <Loader />;
 
   return (
-    <div className="page">
-      <h1>Recommendations</h1>
+    <div className="recommendations-container" style={{ padding: "20px" }}>
+      <h1>Recommended For You</h1>
 
-      {loading && <Loader />}
-
-      {!loading && hasData && (
-        <>
-          {recs.genre_based.length > 0 && (
-            <Row title="Because You Like" data={recs.genre_based} />
-          )}
-          {recs.similar.length > 0 && (
-            <Row title="Similar Anime" data={recs.similar} />
-          )}
-          {recs.time_based.length > 0 && (
-            <Row title="Watch Now" data={recs.time_based} />
-          )}
-          {recs.top.length > 0 && (
-            <Row title="Top Picks" data={recs.top} />
-          )}
-        </>
+      {recs.trending?.length > 0 && (
+        <Row title="🔥 Trending Anime" data={recs.trending} />
       )}
 
-      {!loading && !hasData && (
-        <p style={{ color: "#aaa", padding: "20px" }}>
-          No recommendations available
-        </p>
+      {recs.because_you_like?.length > 0 && (
+        <Row title="🎯 Because You Like" data={recs.because_you_like} />
+      )}
+
+      {recs.top?.length > 0 && (
+        <Row title="⭐ Top Picks" data={recs.top} />
+      )}
+
+      {recs.time_based?.length > 0 && (
+        <Row title="⏰ Watch Right Now" data={recs.time_based} />
+      )}
+
+      {recs.genre_action?.length > 0 && (
+        <Row title="💥 Action Packed" data={recs.genre_action} />
+      )}
+
+      {recs.genre_comedy?.length > 0 && (
+        <Row title="😂 Comedy Central" data={recs.genre_comedy} />
+      )}
+
+      {recs.genre_horror?.length > 0 && (
+        <Row title="👻 Spooky & Horror" data={recs.genre_horror} />
+      )}
+
+      {recs.genre_drama?.length > 0 && (
+        <Row title="🎭 Dramatic Stories" data={recs.genre_drama} />
       )}
     </div>
   );
