@@ -69,7 +69,7 @@ CORS_ALLOWED_ORIGINS = [
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.DjangoTemplates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # Ensure .django is included
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
