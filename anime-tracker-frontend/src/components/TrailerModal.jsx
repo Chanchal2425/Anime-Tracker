@@ -21,28 +21,44 @@ function TrailerModal({ embedUrl, onClose }) {
 
     let videoId = "";
 
-    // Handle youtube.com/watch?v=ID or youtube.com/embed/ID or youtu.be/ID
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
+    // 1. Direct 11-character YouTube Video ID check (common with Jikan API responses)
+    if (typeof url === "string" && /^[a-zA-Z0-9_-]{11}$/.test(url.trim())) {
+      videoId = url.trim();
+    } else {
+      // 2. Standard URL Parsing (youtube.com/watch?v=, youtu.be/, embed/, etc.)
+      const regExp =
+        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
 
-    if (match && match[2].length === 11) {
-      videoId = match[2];
+      if (match && match[2].length === 11) {
+        videoId = match[2];
+      }
     }
 
     if (videoId) {
-      // Force embed format with origin safety to stay in-app
-      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+      const currentOrigin =
+        typeof window !== "undefined" ? window.location.origin : "";
+      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(
+        currentOrigin
+      )}`;
     }
 
+    // Fallback if it's already a complete embed URL
     return url;
   };
 
   const formattedUrl = getEmbedUrl(embedUrl);
 
   return (
-    <div className="modal-overlay" ref={overlayRef} onClick={handleOverlayClick}>
+    <div
+      className="modal-overlay"
+      ref={overlayRef}
+      onClick={handleOverlayClick}
+    >
       <div className="modal-content">
-        <button className="modal-close" onClick={onClose}>✖</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          ✖
+        </button>
         {formattedUrl ? (
           <iframe
             src={formattedUrl}

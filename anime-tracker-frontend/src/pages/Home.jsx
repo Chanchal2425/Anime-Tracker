@@ -6,8 +6,8 @@ import Row from "../components/Row";
 import Hero from "../components/Hero";
 import StatsGrid from "../components/StatsGrid";
 import Loader from "../components/Loader";
-import "../App.css";
 import CommunityFeed from "../components/CommunityFeed";
+import "../App.css";
 
 const JIKAN_HERO_CACHE_KEY = "jikan_hero_cache";
 
@@ -152,14 +152,6 @@ function Home() {
       });
   }, [user, animeList]);
 
-  // Derive Completed list filter
-  const completed = animeList.filter((a) => {
-    if (a.status === "completed") return true;
-    const total = Number(a.total_episodes);
-    const current = Number(a.current_episode);
-    return total > 0 && current >= total;
-  });
-
   // Derive Continue Watching logic
   const continueWatching = useMemo(() => {
     const latestByAnime = {};
@@ -200,35 +192,29 @@ function Home() {
       });
   }, [watchLogs, animeList]);
 
-  // 1. Render Landing page for guests
-  if (!user) {
-    return <Landing />;
-  }
+  if (!user) return <Landing />;
+  if (loading) return <Loader />;
 
-  // 2. Render Loader while authenticated data loads
-  if (loading) {
-    return <Loader />;
-  }
-
-  // 3. Render Dashboard for logged-in users
   return (
-    <div className="home">
+    <div className="home-dashboard">
       {heroAnime ? (
         <Hero anime={heroAnime} />
       ) : (
         animeList[0] && <Hero anime={animeList[0]} />
       )}
-      {stats && <StatsGrid stats={stats} />}
-      <Row
-        title="Continue Watching"
-        data={continueWatching}
-        onAnimeUpdated={handleAnimeUpdated}
-      />
 
-      <CommunityFeed/>
+      <div className="dashboard-content">
+        {stats && <StatsGrid stats={stats} />}
+        
+        <Row
+          title="Continue Watching"
+          data={continueWatching}
+          onAnimeUpdated={handleAnimeUpdated}
+        />
+
+        <CommunityFeed />
+      </div>
     </div>
-
-
   );
 }
 

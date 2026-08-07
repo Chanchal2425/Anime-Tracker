@@ -53,9 +53,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 ROOT_URLCONF = 'main.urls'
 
-# CORS & Cross-Origin Security Configuration
-CORS_ALLOW_CREDENTIALS = True
-
 # Required for Google Identity Services / OAuth Popups
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
@@ -66,6 +63,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 TEMPLATES = [
     {

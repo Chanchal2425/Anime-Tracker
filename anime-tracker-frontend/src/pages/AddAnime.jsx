@@ -14,10 +14,7 @@ function AddAnime() {
   const [topAnime, setTopAnime] = useState([]);
   const [topAnimeLoading, setTopAnimeLoading] = useState(true);
 
-  // Filter Toggle State
   const [showFilters, setShowFilters] = useState(false);
-
-  // Filter Values State
   const [filters, setFilters] = useState({
     genre: "",
     duration: "",
@@ -45,7 +42,6 @@ function AddAnime() {
     }
   }, [query]);
 
-  // Handle Input Changes for Filters
   const handleFilterChange = (field, value) => {
     const updatedFilters = { ...filters, [field]: value };
     setFilters(updatedFilters);
@@ -54,67 +50,159 @@ function AddAnime() {
     }
   };
 
-const executeSearch = async (searchQuery, currentFilters) => {
-  const hasFilter =
-    Boolean(currentFilters.genre) ||
-    Boolean(currentFilters.duration) ||
-    Boolean(currentFilters.sortBy);
+  const executeSearch = async (searchQuery, currentFilters) => {
+    const hasFilter =
+      Boolean(currentFilters.genre) ||
+      Boolean(currentFilters.duration) ||
+      Boolean(currentFilters.sortBy);
 
-  if (!searchQuery.trim() && !hasFilter) return;
+    if (!searchQuery.trim() && !hasFilter) return;
 
-  setLoading(true);
-  setHasSearched(true);
+    setLoading(true);
+    setHasSearched(true);
+    let finalItems = [];
 
-  const params = new URLSearchParams();
-  if (searchQuery.trim()) params.append("q", searchQuery.trim());
-  if (currentFilters.genre) params.append("genre", currentFilters.genre);
-  if (currentFilters.duration) params.append("duration", currentFilters.duration);
-  if (currentFilters.sortBy) params.append("sort_by", currentFilters.sortBy);
+    // 1. TRY PRIMARY BACKEND FIRST
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.append("q", searchQuery.trim());
+      if (currentFilters.genre) params.append("genre", currentFilters.genre);
+      if (currentFilters.duration) params.append("duration", currentFilters.duration);
+      if (currentFilters.sortBy) params.append("sort_by", currentFilters.sortBy);
 
-  try {
-    const res = await API.get(`/search/?${params.toString()}`);
-    let items = res.data || [];
+      const res = await API.get(`/search/?${params.toString()}`);
+      finalItems = res.data || [];
+    } catch (err) {
+      console.warn("Primary API failed, preparing to fallback to AniList", err);
+    }
 
-    // Fetch missing scores from AniList for items returning no score
-    const enrichedItems = await Promise.all(
-      items.map(async (item) => {
-        if (!item.score && !item.rating) {
-          try {
-            const aniRes = await fetch("https://graphql.anilist.co", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                query: `
-                  query ($search: String) {
-                    Media(search: $search, type: ANIME) {
-                      averageScore
-                      meanScore
+    // 2. FALLBACK TO ANILIST IF BACKEND FAILED OR RETURNED EMPTY
+    if (finalItems.length === 0) {
+      try {
+        let aniSort = ["POPULARITY_DESC"];
+        if (currentFilters.sortBy === "rating") aniSort = ["SCORE_DESC"];
+        if (currentFilters.sortBy === "latest") aniSort = ["START_DATE_DESC"];
+
+        const aniVariables = {
+          search: searchQuery.trim() ? searchQuery.trim() : undefined,
+          sort: aniSort,
+        };
+        
+        if (currentFilters.genre) {
+          aniVariables.genre = currentFilters.genre;
+        }
+
+        const aniRes = await fetch("https://graphql.anilist.co", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: `
+              query ($search: String, $sort: [MediaSort], $genre: String) {
+                Page(page: 1, perPage: 25) {
+                  media(search: $search, type: ANIME, sort: $sort, genre: $genre) {
+                    id
+                    idMal
+                    title { english romaji }
+                    coverImage { large }
+                    averageScore
+                    episodes
+                    staff {
+                      edges {
+                        role
+                        node { name { full } }
+                      }
                     }
                   }
-                `,
-                variables: { search: item.title },
-              }),
-            });
-            const aniData = await aniRes.json();
-            const score = aniData?.data?.Media?.averageScore || aniData?.data?.Media?.meanScore;
-            if (score) {
-              return { ...item, score: (score / 10).toFixed(1) };
-            }
-          } catch (e) {
-            // Silently fallback if fetch fails
-          }
-        }
-        return item;
-      })
-    );
+                }
+              }
+            `,
+            variables: aniVariables,
+          }),
+        });
 
-    setResults(enrichedItems);
-  } catch (err) {
-    console.error(err);
-    setResults([]);
-  } finally {
+        const aniData = await aniRes.json();
+        const mediaList = aniData?.data?.Page?.media || [];
+
+        // Format AniList data to match component expectations
+        finalItems = mediaList.map((m) => {
+          const directorStaff = m.staff?.edges?.find((edge) =>
+            edge.role.toLowerCase().includes("director")
+          );
+          return {
+            id: m.idMal || m.id,
+            title: m.title.english || m.title.romaji,
+            image_url: m.coverImage?.large,
+            score: m.averageScore ? (m.averageScore / 10).toFixed(1) : "N/A",
+            episodes: m.episodes || "N/A",
+            director: directorStaff?.node?.name?.full || "Unknown Director",
+          };
+        });
+      } catch (aniErr) {
+        console.error("AniList fallback also failed:", aniErr);
+      }
+    } else {
+      // 3. IF PRIMARY WORKED BUT MISSING DATA, ENRICH WITH ANILIST
+      finalItems = await Promise.all(
+        finalItems.map(async (item) => {
+          if (!item.episodes || !item.director || !item.score) {
+            try {
+              const aniRes = await fetch("https://graphql.anilist.co", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  query: `
+                    query ($search: String) {
+                      Media(search: $search, type: ANIME) {
+                        episodes
+                        averageScore
+                        staff {
+                          edges { role node { name { full } } }
+                        }
+                      }
+                    }
+                  `,
+                  variables: { search: item.title },
+                }),
+              });
+              const aniData = await aniRes.json();
+              const media = aniData?.data?.Media;
+
+              if (media) {
+                const dir = media.staff?.edges?.find((e) =>
+                  e.role.toLowerCase().includes("director")
+                );
+                return {
+                  ...item,
+                  episodes: item.episodes || media.episodes || "N/A",
+                  director: item.director || dir?.node?.name?.full || "Unknown Director",
+                  score: item.score || item.rating || (media.averageScore ? (media.averageScore / 10).toFixed(1) : "N/A"),
+                };
+              }
+            } catch (e) {
+               // Silently fail enrichment
+            }
+          }
+          return item;
+        })
+      );
+    }
+
+    setResults(finalItems);
     setLoading(false);
-  }
+  };
+  // Helper to open details with a normalized structure for Jikan top anime items
+const handleOpenTopAnimeDetail = (anime) => {
+  const normalizedAnime = {
+    ...anime,
+    // Ensure title is extracted properly as a string
+    title: anime.title_english || anime.title || anime.title_japanese || "Untitled",
+    // Extract image url consistently
+    image_url: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
+    // Ensure synopsis is accessible
+    synopsis: anime.synopsis,
+  };
+
+  openAnimeDetail(normalizedAnime);
 };
 
   const searchAnime = (e) => {
@@ -122,12 +210,13 @@ const executeSearch = async (searchQuery, currentFilters) => {
     executeSearch(query, filters);
   };
 
-  const getImage = (anime) =>
-    anime.images?.jpg?.large_image_url ||
-    anime.images?.jpg?.image_url ||
-    anime.image_url ||
-    anime.image ||
-    "https://via.placeholder.com/200x300/222/aaa?text=NA";
+const getImage = (anime) =>
+  anime.images?.jpg?.large_image_url ||
+  anime.images?.jpg?.image_url ||
+  anime.image_url ||
+  anime.coverImage?.large ||
+  anime.image ||
+  "https://via.placeholder.com/200x300/222/aaa?text=NA";
 
   return (
     <div className="add-page">
@@ -208,7 +297,6 @@ const executeSearch = async (searchQuery, currentFilters) => {
                 boxSizing: "border-box"
               }}
             >
-              {/* Genre Filter */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <label style={{ fontSize: "11px", color: "#aaa", textTransform: "uppercase", fontWeight: "bold" }}>Genre</label>
                 <select
@@ -226,9 +314,6 @@ const executeSearch = async (searchQuery, currentFilters) => {
                 </select>
               </div>
 
-
-
-              {/* Duration Filter */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <label style={{ fontSize: "11px", color: "#aaa", textTransform: "uppercase", fontWeight: "bold" }}>Duration</label>
                 <select
@@ -243,7 +328,6 @@ const executeSearch = async (searchQuery, currentFilters) => {
                 </select>
               </div>
 
-              {/* Sorting */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <label style={{ fontSize: "11px", color: "#aaa", textTransform: "uppercase", fontWeight: "bold" }}>Sort By</label>
                 <select
@@ -262,54 +346,90 @@ const executeSearch = async (searchQuery, currentFilters) => {
       </div>
 
       {/* ── FLOATING TOP 10 ── */}
-      {!hasSearched && (
-        topAnimeLoading ? (
-          <Loader small />
-        ) : topAnime.length > 0 && (
-          <div className="floating-row">
-            <div className="floating-badge">
-              <span className="floating-badge-icon">🔥</span>
-              <span className="floating-badge-text">Top 10 Now</span>
-            </div>
-            <div className="floating-track">
-              {[0, 1].map((copyIdx) => (
-                <div className="floating-slide" key={copyIdx}>
-                  {topAnime.map((anime, i) => {
-                    const added = isInWatchlist(anime);
-                    return (
-                      <div className="floating-card" key={`${copyIdx}-${i}`}>
-                        <img src={getImage(anime)} alt={anime.title} loading="lazy" />
-                        <div className="floating-card-overlay">
-                          <button
-                            className="floating-btn play-btn"
-                            onClick={(e) => { e.stopPropagation(); openTrailer(anime); }}
-                          >
-                            ▶ Play
-                          </button>
-                          <button
-                            className={`floating-btn add-btn${added ? " added" : ""}`}
-                            onClick={() => addToWatchlist(anime)}
-                          >
-                            {added ? "✓ Added" : "+ Add"}
-                          </button>
-                          <button
-                            className="floating-btn"
-                            onClick={() => openAnimeDetail(anime)}
-                          >
-                            ℹ More Info
-                          </button>
-                        </div>
-                        <p className="floating-card-title">{anime.title}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      )}
+{!hasSearched && (
+  topAnimeLoading ? (
+    <Loader small />
+  ) : topAnime.length > 0 && (
+    <div className="floating-row" style={{ width: "100%", overflowX: "hidden", padding: "20px 0" }}>
+      <div className="floating-badge">
+        <span className="floating-badge-icon">🔥</span>
+        <span className="floating-badge-text">Top 10 Now</span>
+      </div>
+      <div className="floating-track" style={{ display: "flex", gap: "16px" }}>
+        {[0, 1].map((copyIdx) => (
+          <div className="floating-slide" key={copyIdx} style={{ display: "flex", gap: "16px" }}>
+            {topAnime.map((anime, i) => {
+              const added = isInWatchlist(anime);
+              // Normalize title across Jikan and AniList
+              const displayTitle = anime.title_english || anime.title || anime.title?.english || "Untitled";
 
+              return (
+                <div 
+                  className="floating-card" 
+                  key={`${copyIdx}-${i}`}
+                  style={{
+                    minWidth: "160px",
+                    width: "160px",
+                    position: "relative",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    background: "#222",
+                    flexShrink: 0
+                  }}
+                >
+                  <img 
+                    src={getImage(anime)} 
+                    alt={displayTitle} 
+                    loading="lazy" 
+                    style={{ width: "100%", height: "230px", objectFit: "cover", display: "block" }}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/200x300/222/aaa?text=No+Image";
+                    }}
+                  />
+                  <div className="floating-card-overlay">
+                    <button
+                      className="floating-btn play-btn"
+                      onClick={(e) => { e.stopPropagation(); openTrailer(anime); }}
+                    >
+                      ▶ Play
+                    </button>
+                    <button
+                      className={`floating-btn add-btn${added ? " added" : ""}`}
+                      onClick={() => addToWatchlist(anime)}
+                    >
+                      {added ? "✓ Added" : "+ Add"}
+                    </button>
+ {/* Replace this in your floating card section */}
+<button
+  className="floating-btn"
+  onClick={() => handleOpenTopAnimeDetail(anime)}
+>
+  ℹ More Info
+</button>
+                  </div>
+                  <p 
+                    className="floating-card-title"
+                    style={{
+                      padding: "8px",
+                      margin: 0,
+                      fontSize: "0.85rem",
+                      color: "#fff",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }}
+                  >
+                    {displayTitle}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+)}
       {/* ── SEARCH RESULTS ── */}
       {hasSearched && (
         <div className="search-results">
@@ -359,7 +479,10 @@ const executeSearch = async (searchQuery, currentFilters) => {
                     </div>
                     <div className="card-info">
                       <h3 className="card-title">{anime.title}</h3>
-                      <p className="card-rating">⭐ {anime.rating || "N/A"}</p>
+                      <div className="card-meta" style={{ fontSize: "12px", color: "#aaa", marginTop: "4px" }}>
+                        <span>📺 Ep: {anime.episodes || "N/A"}</span> • <span>🎬 {anime.director || "Unknown"}</span>
+                      </div>
+                      <p className="card-rating" style={{ marginTop: "4px" }}>⭐ {anime.score || anime.rating || "N/A"}</p>
                     </div>
                   </div>
                 );
