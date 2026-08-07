@@ -17,7 +17,7 @@ function Recommendations() {
   if (loading) return <Loader />;
 
   return (
-    <div className="recommendations-container" style={{ padding: "20px" }}>
+    <div className="recommendations-container" style={{ padding: "10px" }}>
       <h1>Recommended For You</h1>
 
       {recs.trending?.length > 0 && (
