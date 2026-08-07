@@ -17,8 +17,8 @@ function Recommendations() {
   if (loading) return <Loader />;
 
   return (
-    <div className="recommendations-container" style={{ padding: "10px" }}>
-      <h1>Recommended For You</h1>
+    <div className="recommendations-container" style={{ padding: "0.5px" }}>
+      <h1 style={{ paddingLeft: "15px" }}>Recommended For You</h1>
 
       {recs.trending?.length > 0 && (
         <Row title="🔥 Trending Anime" data={recs.trending} />
